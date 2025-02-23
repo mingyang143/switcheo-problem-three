@@ -1,8 +1,8 @@
-# Switcheo problem three
+# Switcheo problem three (Note: the main file with the code is inside App.tsx)
 
 ## Issues with the code
 
-1. Minor issue: The Wallet Balance interfaces should not be in the same file as the actual logic code. The interfaces should be placed in a directory called model.
+1. The Wallet Balance interfaces should not be in the same file as the actual logic code. The similar interfaces should be placed in a file WalletBalance.models.tsx that is inside a directory called Model.
 
 2. ` useEffect(() => {
   const datasource = new Datasource(
@@ -53,7 +53,7 @@ console.err is not the correct function. It should be console.error(error)
 
 const WalletPage: React.FC<Props> = ({children, ...rest}) => {`
 
-The interface Props does not have to property children so we cannot pass children props. I the property 'children'. I also removed BoxProps since it is not used anywhere else in the code
+The interface Props does not have to property children so we cannot pass children props. I added the property 'children'. I also removed BoxProps since it is not used anywhere else in the code
 
 7. `const balances = useWalletBalances();`
    useWalletBalances is a hook that should be imported.
@@ -67,8 +67,7 @@ The interface Props does not have to property children so we cannot pass childre
     formattedAmount={balance.formatted}
   />
 );`
-   I removed the className prop as classes.row does not exist.
-   I also added a import for WalletRow
+   I removed the className prop as classes.row does not exist. I also added a import for WalletRow.
 
 9. Other minor syntax errors are fixed according to my interpretation of the code. eg. I changed `const rows = sortedBalances.map(
   (balance: FormattedWalletBalance, index: number) => {
@@ -82,7 +81,9 @@ The interface Props does not have to property children so we cannot pass childre
       />
     );
   }
-);` to `const rows = formattedBalances.map(
+);`
+   to
+   `const rows = formattedBalances.map(
     (balance: FormattedWalletBalance, index: number) => {
       const usdValue = prices[balance.currency] * balance.amount;
       return (
