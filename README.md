@@ -2,7 +2,9 @@
 
 ## Issues with the code
 
-1. ` useEffect(() => {
+1. Minor issue: The Wallet Balance interfaces should not be in the same file as the actual logic code. The interfaces should be placed in a directory called model.
+
+2. ` useEffect(() => {
   const datasource = new Datasource(
     "https://interview.switcheo.com/prices.json"
   );
@@ -17,6 +19,82 @@
 }, []);`
 
 console.err is not the correct function. It should be console.error(error)
+
+3. `if (lhsPriority > -99) {
+  if (balance.amount <= 0) {
+    return true;
+  }
+}`
+   I believe lhsPriority is a typo. It should be balancePriority.
+   Wallet balance seems to be missing a blockchain (String) attribute in the interface
+
+4. `const getPriority = (blockchain: any): number => {
+  switch (blockchain) {
+    case "Osmosis":
+      return 100;
+    case "Ethereum":
+      return 50;
+    case "Arbitrum":
+      return 30;
+    case "Zilliqa":
+      return 20;
+    case "Neo":
+      return 20;
+    default:
+      return -99;
+  }
+};`
+   Using any as a type is really not a good practise as it is not making use of typescript's type safety. We should change any to string type.
+
+5. `const WalletPage: React.FC<Props> = (props: Props) => {`
+   WalletPage component is not exported.
+
+6. `interface Props extends BoxProps {}
+
+const WalletPage: React.FC<Props> = ({children, ...rest}) => {`
+
+The interface Props does not have to property children so we cannot pass children props. I the property 'children'. I also removed BoxProps since it is not used anywhere else in the code
+
+7. `const balances = useWalletBalances();`
+   useWalletBalances is a hook that should be imported.
+
+8. ` return (
+  <WalletRow
+    className={classes.row}
+    key={index}
+    amount={balance.amount}
+    usdValue={usdValue}
+    formattedAmount={balance.formatted}
+  />
+);`
+   I removed the className prop as classes.row does not exist.
+   I also added a import for WalletRow
+
+9. Other minor syntax errors are fixed according to my interpretation of the code. eg. I changed `const rows = sortedBalances.map(
+  (balance: FormattedWalletBalance, index: number) => {
+    const usdValue = prices[balance.currency] * balance.amount;
+    return (
+      <WalletRow
+        key={index}
+        amount={balance.amount}
+        usdValue={usdValue}
+        formattedAmount={balance.formatted}
+      />
+    );
+  }
+);` to `const rows = formattedBalances.map(
+    (balance: FormattedWalletBalance, index: number) => {
+      const usdValue = prices[balance.currency] * balance.amount;
+      return (
+        <WalletRow
+          key={index}
+          amount={balance.amount}
+          usdValue={usdValue}
+          formattedAmount={balance.formatted}
+        />
+      );
+    }
+  );` since rows requires each balance to be of FormattedWalletBalance type.
 
 ---
 

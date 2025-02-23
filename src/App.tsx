@@ -1,24 +1,41 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useWalletBalances } from "./Hooks/useWalletBalances";
+import WalletRow from "./Components/WalletRow";
 
-interface WalletBalance {
-  currency: string;
-  amount: number;
-}
-interface FormattedWalletBalance {
-  currency: string;
-  amount: number;
-  formatted: string;
-}
+import {
+  WalletBalance,
+  FormattedWalletBalance,
+  CurrencyPrice,
+} from "./Models/WalletBalance.models";
 
 class Datasource {
   // TODO: Implement datasource class
+  private url: string;
+  constructor(url: string) {
+    this.url = url;
+  }
+
+  async getPrices(): Promise<Record<string, number>> {
+    return fetch(this.url)
+      .then((response) => response.json())
+      .then((data: CurrencyPrice[]) => data)
+      .then((data: CurrencyPrice[]) => {
+        const prices: Record<string, number> = {};
+        data.forEach((price: CurrencyPrice) => {
+          prices[price.currency] = price.price;
+        });
+        return prices;
+      });
+  }
 }
 
-interface Props extends BoxProps {}
-const WalletPage: React.FC<Props> = (props: Props) => {
-  const { children, ...rest } = props;
+interface Props {
+  children: React.ReactNode;
+}
+
+const WalletPage: React.FC<Props> = ({ children, ...rest }) => {
   const balances = useWalletBalances();
-  const [prices, setPrices] = useState({});
+  const [prices, setPrices] = useState<Record<string, number>>({});
 
   useEffect(() => {
     const datasource = new Datasource(
@@ -34,7 +51,7 @@ const WalletPage: React.FC<Props> = (props: Props) => {
       });
   }, []);
 
-  const getPriority = (blockchain: any): number => {
+  const getPriority = (blockchain: string): number => {
     switch (blockchain) {
       case "Osmosis":
         return 100;
@@ -55,7 +72,7 @@ const WalletPage: React.FC<Props> = (props: Props) => {
     return balances
       .filter((balance: WalletBalance) => {
         const balancePriority = getPriority(balance.blockchain);
-        if (lhsPriority > -99) {
+        if (balancePriority > -99) {
           if (balance.amount <= 0) {
             return true;
           }
@@ -80,12 +97,11 @@ const WalletPage: React.FC<Props> = (props: Props) => {
     };
   });
 
-  const rows = sortedBalances.map(
+  const rows = formattedBalances.map(
     (balance: FormattedWalletBalance, index: number) => {
       const usdValue = prices[balance.currency] * balance.amount;
       return (
         <WalletRow
-          className={classes.row}
           key={index}
           amount={balance.amount}
           usdValue={usdValue}
@@ -95,5 +111,12 @@ const WalletPage: React.FC<Props> = (props: Props) => {
     }
   );
 
-  return <div {...rest}>{rows}</div>;
+  return (
+    <div {...rest}>
+      {rows}
+      {children}
+    </div>
+  );
 };
+
+export default WalletPage;
