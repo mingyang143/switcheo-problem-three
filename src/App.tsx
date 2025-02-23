@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
-import { useWalletBalances } from "./Hooks/useWalletBalances";
-import WalletRow from "./Components/WalletRow";
+import useWalletBalances from "./Hooks/useWalletBalances.tsx";
+import WalletRow from "./Components/WalletRow.tsx";
 
 import {
   WalletBalance,
@@ -97,19 +97,17 @@ const WalletPage: React.FC<Props> = ({ children, ...rest }) => {
     };
   });
 
-  const rows = formattedBalances.map(
-    (balance: FormattedWalletBalance, index: number) => {
-      const usdValue = prices[balance.currency] * balance.amount;
-      return (
-        <WalletRow
-          key={index}
-          amount={balance.amount}
-          usdValue={usdValue}
-          formattedAmount={balance.formatted}
-        />
-      );
-    }
-  );
+  const rows = formattedBalances.map((balance: FormattedWalletBalance) => {
+    const usdValue = prices[balance.currency] * balance.amount;
+    return (
+      <WalletRow
+        key={balance.currency}
+        amount={balance.amount}
+        usdValue={usdValue}
+        formattedAmount={balance.formatted}
+      />
+    );
+  });
 
   return (
     <div {...rest}>

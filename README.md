@@ -96,6 +96,13 @@ The interface Props does not have to property children so we cannot pass childre
     }
   );` since rows requires each balance to be of FormattedWalletBalance type.
 
+10. ` <WalletRow
+  key={index}
+  amount={balance.amount}
+  usdValue={usdValue}
+  formattedAmount={balance.formatted}
+/>` key is not good to be sued as index as it might casue unneccesary re-renders. I decided to use a more unique identifier, balance. currency
+
 ---
 
 # React + TypeScript + Vite
